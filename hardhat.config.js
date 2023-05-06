@@ -30,8 +30,11 @@ module.exports = {
       default: 0,
       1: 0,
     },
-    player: {
+    alice: {
       default: 1,
+    },
+    bob: {
+      default: 2,
     },
   },
   solidity: "0.8.17",

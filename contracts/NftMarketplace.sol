@@ -44,6 +44,8 @@ contract NftMarketplace is ReentrancyGuard {
         uint256 indexed tokenId
     );
 
+    event ProceedsWithdrawn(address indexed caller, uint256 proceeds);
+
     mapping(address => mapping(uint256 => Listing)) private s_listings;
     mapping(address => uint256) private s_proceeds;
 
@@ -81,7 +83,7 @@ contract NftMarketplace is ReentrancyGuard {
         notListed(nftAddress, tokenId)
         isOwner(nftAddress, tokenId, msg.sender)
     {
-        if (price <= 0) {
+        if (price == 0) {
             revert NftMarketplace__PriceMustBeAboveZero();
         }
 
@@ -139,7 +141,7 @@ contract NftMarketplace is ReentrancyGuard {
         isOwner(nftAddress, tokenId, msg.sender)
         isListed(nftAddress, tokenId)
     {
-        if (newPrice <= 0) {
+        if (newPrice == 0) {
             revert NftMarketplace__PriceMustBeAboveZero();
         }
         s_listings[nftAddress][tokenId].price = newPrice;
@@ -148,7 +150,7 @@ contract NftMarketplace is ReentrancyGuard {
 
     function withdrawProceeds() external {
         uint256 proceeds = s_proceeds[msg.sender];
-        if (proceeds <= 0) {
+        if (proceeds == 0) {
             revert NftMarketplace__NoProceeds();
         }
 
@@ -157,6 +159,7 @@ contract NftMarketplace is ReentrancyGuard {
         if (!success) {
             revert NftMarketplace__TransferFailed();
         }
+        emit ProceedsWithdrawn(msg.sender, proceeds);
     }
 
     function getListing(
